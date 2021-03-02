@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  memcached:
+    image: memcached:alpine
+    container_name: memcached
+    hostname: memcached
+    ports:
+      - '11211:11211'
+    restart: always
+    networks:
+      - container-link
+
+networks:
+  default:
+    external:
+      name: bridge
+  container-link:
+    name: docker.internal
