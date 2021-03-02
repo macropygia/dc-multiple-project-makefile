@@ -2,6 +2,8 @@
 
 複数のdocker-composeプロジェクトをディレクトリ構造を元に操作するMakefile。
 
+![animation](https://user-images.githubusercontent.com/3162324/109684613-ca6e5680-7bc3-11eb-9837-7cf63bca2a9d.gif)
+
 ## ファイルツリー
 
 ```text

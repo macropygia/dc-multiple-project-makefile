@@ -2,6 +2,8 @@
 
 Makefile for handle multiple docker-compose projects based on a directory structure and some files.
 
+![animation](https://user-images.githubusercontent.com/3162324/109684613-ca6e5680-7bc3-11eb-9837-7cf63bca2a9d.gif)
+
 ## File tree
 
 ```text
