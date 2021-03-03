@@ -58,16 +58,6 @@ top:
 do:
 	$(foreach t,$(TARGETS),$(call exec,$(t),$(cmd)))
 
-# Info
-
-define show
-	@echo -e "$1\t$(shell cat ./$1/DESCRIPTION 2>/dev/null)" | expand -t 18
-
-endef
-
-info:
-	$(foreach t,$(TARGETS),$(call show,$(t)))
-
 # Status
 
 active:
@@ -75,13 +65,20 @@ active:
 
 # List
 
+EXPAND_POS := 18,28
+
 define list
-	@echo -e "$1\t$(shell cat ./$1/ALIAS 2>/dev/null)\t$(shell cat ./$1/DESCRIPTION 2>/dev/null)" | expand -t 18,28
+	@echo -e "$1\t$(shell cat ./$1/ALIAS 2>/dev/null)\t$(shell cat ./$1/DESCRIPTION 2>/dev/null)" | expand -t $(EXPAND_POS)
 
 endef
 
+info:
+	@echo -e "Project Dir\tAlias\tDescription" | expand -t $(EXPAND_POS)
+	@echo ------------------------------------------------------------
+	$(foreach t,$(TARGETS),$(call list,$(t)))
+
 ls:
-	@echo -e "Project Name\tAlias\tDescription" | expand -t 18,28
+	@echo -e "Project Dir\tAlias\tDescription" | expand -t $(EXPAND_POS)
 	@echo ------------------------------------------------------------
 	$(foreach p,$(PROJECTS),$(call list,$(p)))
 
