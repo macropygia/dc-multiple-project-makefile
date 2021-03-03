@@ -46,7 +46,7 @@ $ make [command]
 
 ## コマンド
 
-### ディレクトリ名・エイリアス・プリセットと共に使用
+### ディレクトリ名・エイリアス・プリセットと共に使用するコマンド
 
 - `up`, `build`, `pull`, `down`, `start`, `stop`, `restart`, `pause`, `unpause`, `ps`, `top`
     - 対応するdocker-composeコマンドを実行する
@@ -54,23 +54,9 @@ $ make [command]
 - `do cmd="[any docker-compose command]"`
     - 任意のdocker-composeコマンドを実行する
 - `info`
-    - ディレクトリ名と説明を表示する
+    - ディレクトリ名・エイリアス・説明を表示する
 
-#### コマンドチェイン
-
-```bash
-$ make proj1 proj2 down pull up
-```
-
-上記は下記と同様に動作する。
-
-```bash
-$ make proj1 proj2 down
-$ make proj1 proj2 pull
-$ make proj1 proj2 up
-```
-
-### 単独で使用
+### 単独で使用するコマンド
 
 - `active`
     - `$ make all ps | grep Up` と同じ
@@ -80,9 +66,26 @@ $ make proj1 proj2 up
 - `clean`
     - `.dc_history` と `.dc_latest` を削除する
 
+### Tips
+
+処理対象の追加もコマンドも実体はmakeのターゲットであり、順次実行される。
+
+```bash
+$ make proj1 down proj2 pull proj3 up
+```
+
+例えばこれは以下のように動作する。
+
+1. 処理対象に `proj1` を追加
+2. 処理対象に `down` を実行（対象はproj1）
+3. 処理対象に `proj2` を追加
+4. 処理対象に `pull` を実行（対象はproj1,2）
+5. 処理対象に `proj3` を追加
+6. 処理対象に `up -d` を実行（対象はproj1,2,3）
+
 ## プリセット
 
-`preset.mk` に記述する。
+`preset.mk` に記述する。動作に支障がなければ `.PHONY` は書かなくても構わない。
 
 ```Makefile
 .PHONY: preset_name
@@ -93,12 +96,12 @@ preset_name: [dirname|alias|preset]...
 
 ```Makefile
 .PHONY: preset1 preset2 preset3
-preset1: proj1 proj2 proj3
-preset2: proj1 proj4
+preset1: proj1 proj3 proj5
+preset2: proj2 proj3
 preset3: preset1 preset2
 ```
 
-`preset3` は `proj1 proj2 proj3 proj4` として動作する。
+`preset3` は `proj1 proj3 proj5 proj2` として動作する。
 
 ### ビルトインプリセット
 
@@ -111,7 +114,7 @@ preset3: preset1 preset2
 
 ### `./*/docker-compose.yml`
 
-`docker-compose.yml` の存在する子ディレクトリがプロジェクトとして認識される。
+`docker-compose.yml` の存在するサブディレクトリがdocker-composeプロジェクトとして認識される。
 
 ### `./*/.env`
 

@@ -54,20 +54,6 @@ $ make [command]
 - `info`
     - Show directory name and description.
 
-#### Chain
-
-```bash
-$ make proj1 proj2 down pull up
-```
-
-as same as
-
-```bash
-$ make proj1 proj2 down
-$ make proj1 proj2 pull
-$ make proj1 proj2 up
-```
-
 ### Use independently
 
 - `active`
@@ -76,6 +62,25 @@ $ make proj1 proj2 up
     - Show the directory name, alias, and description of all projects.
 - `clean`
     - Remove `.dc_history` and `.dc_latest`.
+
+### Tips
+
+The target of make are execute sequentially. (Ref: [GNU Make](https://www.gnu.org/software/make/))
+
+So...
+
+```bash
+$ make proj1 down proj2 pull proj3 up
+```
+
+This works as follows:
+
+1. Add `proj1` to the processing target
+2. Execute `down` to `proj1`
+3. Add `proj2` to the processing target
+4. Execute `pull` to `proj1,2`
+5. Add `proj3` to the processing target
+6. Execute `up -d` to `proj1-3`
 
 ## Preset
 
@@ -90,14 +95,14 @@ preset_name: [dirname|alias|preset]...
 
 ```Makefile
 .PHONY: preset1 preset2 preset3
-preset1: proj1 proj2 proj3
-preset2: proj1 proj4
+preset1: proj1 proj3 proj5
+preset2: proj2 proj3
 preset3: preset1 preset2
 ```
 
-`preset3` means `proj1 proj2 proj3 proj4`.
+`preset3` means `proj1 proj3 proj5 proj2`.
 
-### Built in preset
+### Built-in preset
 
 - `all`
     - All projects.
@@ -108,19 +113,19 @@ preset3: preset1 preset2
 
 ### `./*/docker-compose.yml`
 
-The directory containing this file will be recognized as the project.
+The directory containing `docker-compose.yml` will detect as the docker-compose project.
 
 ### `./*/.env` (Optional)
 
-Strongly recommended to set the project name using `COMPOSE_PROJECT_NAME`.
+Strongly recommended setting the project name using `COMPOSE_PROJECT_NAME`.
 
 ### `./*/DESCRIPTION` (Optional)
 
-A short text used in `ls` and `info` command.
+Write a short description used in `ls` and `info` command.
 
 ### `./*/ALIAS` (Optional)
 
-A short name that can be used as a directory name.
+Write a short name that can use as an alternative to the directory name.
 
 ### `./preset.mk` (Optional)
 
@@ -132,4 +137,4 @@ A temporary file to record the current project being operated.
 
 ### `./.dc_history`
 
-Log of executed commands except `ps` and `top`.
+Log of executed commands except for `ps` and `top`.
