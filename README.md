@@ -54,6 +54,20 @@ $ make [command]
 - `info`
     - Show directory name and description.
 
+#### Chain
+
+```bash
+$ make proj1 proj2 down pull up
+```
+
+as same as
+
+```bash
+$ make proj1 proj2 down
+$ make proj1 proj2 pull
+$ make proj1 proj2 up
+```
+
 ### Use independently
 
 - `active`

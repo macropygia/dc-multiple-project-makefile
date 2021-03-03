@@ -56,6 +56,20 @@ $ make [command]
 - `info`
     - ディレクトリ名と説明を表示する
 
+#### コマンドチェイン
+
+```bash
+$ make proj1 proj2 down pull up
+```
+
+上記は下記と同様に動作する。
+
+```bash
+$ make proj1 proj2 down
+$ make proj1 proj2 pull
+$ make proj1 proj2 up
+```
+
 ### 単独で使用
 
 - `active`

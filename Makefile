@@ -102,6 +102,7 @@ $(foreach a,$(ALIASES),$(eval $(call alias,$(a))))
 clean:
 	$(shell rm -f .dc_latest)
 	$(shell rm -f .dc_history)
+	@echo .dc_* files are removed.
 
 # Preset
 
