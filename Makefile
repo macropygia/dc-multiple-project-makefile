@@ -14,7 +14,7 @@ TAIL := all
 
 define exec
 	@-docker compose -f ./$1/docker-compose.yml $2
-	@echo -e "$(NOW)\tdocker compose -f ./$1/docker-compose.yml $2" >> .dc_history
+	@printf "$(NOW)\tdocker compose -f ./$1/docker-compose.yml $2\n" >> .dc_history
 
 endef
 
