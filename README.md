@@ -4,7 +4,7 @@ Makefile for handle multiple docker-compose projects based on a directory struct
 
 ![animation](https://user-images.githubusercontent.com/3162324/109684613-ca6e5680-7bc3-11eb-9837-7cf63bca2a9d.gif)
 
-## File tree
+## Typical structure
 
 ```text
 .
@@ -12,23 +12,23 @@ Makefile for handle multiple docker-compose projects based on a directory struct
 |-- preset.mk
 |-- gitlab
 |   |-- .env
-|   |-- DESCRIPTION
+|   |-- .desc
 |   `-- docker-compose.yml
 |-- pgadmin
 |   |-- .env
-|   |-- ALIAS
-|   |-- DESCRIPTION
+|   |-- .alias
+|   |-- .desc
 |   `-- docker-compose.yml
 |-- postgres
 |   |-- .env
-|   |-- ALIAS
-|   |-- DESCRIPTION
+|   |-- .alias
+|   |-- .desc
 |   |-- docker-compose.yml
 |   `-- init
 |       `-- init_gitlab.sh
 `-- redis
     |-- .env
-    |-- DESCRIPTION
+    |-- .desc
     `-- docker-compose.yml
 ```
 
@@ -48,9 +48,13 @@ $ make [command]
 
 ### Use with dirname/alias/preset
 
-- `up`, `build`, `pull`, `down`, `start`, `stop`, `restart`, `pause`, `unpause`, `ps`, `top`
-    - `up` is executed with `-d` option.
-- `do cmd="[any docker-compose command]"`
+- `up`, `upf`, `build`, `pull`, `down`, `start`, `stop`, `restart`, `pause`, `unpause`, `ps`, `logs`, `logsf`, `logs<int>`, `logsf<int>`, `top`
+    - `up` executes `up -d` .
+    - `upf` executes `up` .
+    - `logsf` executes `logs -f` .
+    - `logs<int>` executes `logs -n <int>` .
+    - `logsf<int>` executes `logs -f -n <int>` .
+- `do cmd="[any docker compose command]"`
 - `info`
     - Show directory name and description.
 
@@ -65,7 +69,7 @@ $ make [command]
 
 ### Tips
 
-The target of make are execute sequentially. (Ref: [GNU Make](https://www.gnu.org/software/make/))
+Targets are executed sequentially. (Ref: [GNU Make](https://www.gnu.org/software/make/))
 
 So...
 
@@ -78,9 +82,9 @@ This works as follows:
 1. Add `proj1` to the processing target
 2. Execute `down` to `proj1`
 3. Add `proj2` to the processing target
-4. Execute `pull` to `proj1,2`
+4. Execute `pull` to `proj1 & 2`
 5. Add `proj3` to the processing target
-6. Execute `up -d` to `proj1-3`
+6. Execute `up -d` to `proj1 & 2 & 3`
 
 ## Preset
 
@@ -88,7 +92,7 @@ Define at the `preset.mk`.
 
 ```Makefile
 .PHONY: preset_name
-preset_name: [dirname|alias|preset]...
+preset_name: [dirname|alias|preset|command]...
 ```
 
 ### Example
@@ -113,17 +117,17 @@ preset3: preset1 preset2
 
 ### `./*/docker-compose.yml`
 
-The directory containing `docker-compose.yml` will detect as the docker-compose project.
+The directory containing `docker-compose.yml` will detect as the docker compose project.
 
 ### `./*/.env` (Optional)
 
 Strongly recommended setting the project name using `COMPOSE_PROJECT_NAME`.
 
-### `./*/DESCRIPTION` (Optional)
+### `./*/.desc` (Optional)
 
-Write a short description used in `ls` and `info` command.
+Write a short description used in `ls` and `info` commands.
 
-### `./*/ALIAS` (Optional)
+### `./*/.alias` (Optional)
 
 Write a short name that can use as an alternative to the directory name.
 
@@ -137,4 +141,4 @@ A temporary file to record the current project being operated.
 
 ### `./.dc_history`
 
-Log of executed commands except for `ps` and `top`.
+Log of executed commands except for `ps` , `logs` , `logsf` and `top`.

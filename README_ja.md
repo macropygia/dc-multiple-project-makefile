@@ -12,23 +12,23 @@
 |-- preset.mk
 |-- gitlab
 |   |-- .env
-|   |-- DESCRIPTION
+|   |-- .desc
 |   `-- docker-compose.yml
 |-- pgadmin
 |   |-- .env
-|   |-- ALIAS
-|   |-- DESCRIPTION
+|   |-- .alias
+|   |-- .desc
 |   `-- docker-compose.yml
 |-- postgres
 |   |-- .env
-|   |-- ALIAS
-|   |-- DESCRIPTION
+|   |-- .alias
+|   |-- .desc
 |   |-- docker-compose.yml
 |   `-- init
 |       `-- init_gitlab.sh
 `-- redis
     |-- .env
-    |-- DESCRIPTION
+    |-- .desc
     `-- docker-compose.yml
 ```
 
@@ -48,9 +48,13 @@ $ make [command]
 
 ### ディレクトリ名・エイリアス・プリセットと共に使用するコマンド
 
-- `up`, `build`, `pull`, `down`, `start`, `stop`, `restart`, `pause`, `unpause`, `ps`, `top`
+- `up`, `upf`, `build`, `pull`, `down`, `start`, `stop`, `restart`, `pause`, `unpause`, `ps`, `logs`, `logsf`, `logs<int>`, `logsf<int>`, `top`
     - 対応するdocker-composeコマンドを実行する
     - `up` は `up -d` を実行する
+    - `upf` は `up` を実行する
+    - `logsf` は `logs -f` を実行する
+    - `logs<int>` は `logs -n <int>` を実行する
+    - `logsf<int>` は `logs -f -n <int>` を実行する
 - `do cmd="[any docker-compose command]"`
     - 任意のdocker-composeコマンドを実行する
 - `info`
@@ -89,7 +93,7 @@ $ make proj1 down proj2 pull proj3 up
 
 ```Makefile
 .PHONY: preset_name
-preset_name: [dirname|alias|preset]...
+preset_name: [dirname|alias|preset|command]...
 ```
 
 ### 設定例
@@ -120,11 +124,11 @@ preset3: preset1 preset2
 
 `COMPOSE_PROJECT_NAME` でプロジェクト名を指定しておくことを強く推奨する。
 
-### `./*/DESCRIPTION`
+### `./*/.desc`
 
 `ls` などのコマンドで表示されるプロジェクトの簡単な説明。1行のプレーンテキスト。（任意）
 
-### `./*/ALIAS`
+### `./*/.alias`
 
 プロジェクト名（ディレクトリ名）の代わりに使用できる短い名前。1行のプレーンテキスト。（任意）
 

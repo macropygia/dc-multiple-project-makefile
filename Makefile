@@ -1,29 +1,33 @@
 PROJECTS := $(foreach path,$(shell ls ./*/docker-compose.yml),$(patsubst ./%/,%,$(dir $(path))))
-ALIASES := $(foreach alias,$(shell ls ./*/ALIAS),$(patsubst ./%/,%,$(dir $(alias))))
+ALIASES := $(foreach alias,$(shell ls ./*/.alias 2>/dev/null),$(patsubst ./%/,%,$(dir $(alias))))
 LATEST := $(strip $(shell cat .dc_latest 2>/dev/null))
 $(shell echo -n "" > .dc_latest)
 TARGETS = $(strip $(shell cat .dc_latest))
 NOW = $(shell date --rfc-2822)
+TAIL := all
 
 .PHONY: $(PROJECTS)
-.PHONY: up build pull down start stop restart pause unpause ps top do ls
-.PHONY: info active
+.PHONY: up upf build pull down start stop restart pause unpause ps log logs top do ls
+.PHONY: info active clean
 
 # Command
 
 define exec
-	@-docker-compose -f ./$1/docker-compose.yml $2
-	@echo -e "$(NOW)\tdocker-compose -f ./$1/docker-compose.yml $2" >> .dc_history
+	@-docker compose -f ./$1/docker-compose.yml $2
+	@echo -e "$(NOW)\tdocker compose -f ./$1/docker-compose.yml $2" >> .dc_history
 
 endef
 
 define exec_nolog
-	@-docker-compose -f ./$1/docker-compose.yml $2
+	@-docker compose -f ./$1/docker-compose.yml $2
 
 endef
 
 up:
 	$(foreach t,$(TARGETS),$(call exec,$(t),up -d))
+
+upf:
+	$(foreach t,$(TARGETS),$(call exec,$(t),up))
 
 build:
 	$(foreach t,$(TARGETS),$(call exec,$(t),$@))
@@ -52,6 +56,18 @@ unpause:
 ps:
 	$(foreach t,$(TARGETS),$(call exec_nolog,$(t),$@))
 
+logs:
+	$(foreach t,$(TARGETS),$(call exec_nolog,$(t),$@))
+
+logs%:
+	$(foreach t,$(TARGETS),$(call exec_nolog,$(t),logs --tail=$(@:logs%=%)))
+
+logsf:
+	$(foreach t,$(TARGETS),$(call exec_nolog,$(t),logs -f))
+
+logsf%:
+	$(foreach t,$(TARGETS),$(call exec_nolog,$(t),logs -f --tail=$(@:logsf%=%)))
+
 top:
 	$(foreach t,$(TARGETS),$(call exec_nolog,$(t),$@))
 
@@ -61,24 +77,24 @@ do:
 # Status
 
 active:
-	@make all ps | grep Up
+	@make all ps | grep running
 
 # List
 
 EXPAND_POS := 18,28
 
 define list
-	@echo -e "$1\t$(shell cat ./$1/ALIAS 2>/dev/null)\t$(shell cat ./$1/DESCRIPTION 2>/dev/null)" | expand -t $(EXPAND_POS)
+	@printf "$1\t$(shell cat ./$1/.alias 2>/dev/null)\t$(shell cat ./$1/.desc 2>/dev/null)\n" | expand -t $(EXPAND_POS)
 
 endef
 
 info:
-	@echo -e "Project Dir\tAlias\tDescription" | expand -t $(EXPAND_POS)
+	@printf "Project Dir\tAlias\tDescription\n" | expand -t $(EXPAND_POS)
 	@echo ------------------------------------------------------------
 	$(foreach t,$(TARGETS),$(call list,$(t)))
 
 ls:
-	@echo -e "Project Dir\tAlias\tDescription" | expand -t $(EXPAND_POS)
+	@printf "Project Dir\tAlias\tDescription\n" | expand -t $(EXPAND_POS)
 	@echo ------------------------------------------------------------
 	$(foreach p,$(PROJECTS),$(call list,$(p)))
 
@@ -92,7 +108,7 @@ endef
 $(foreach p,$(PROJECTS),$(eval $(call project,$(p))))
 
 define alias
-$(shell cat ./$1/ALIAS): $1
+$(shell cat ./$1/.alias): $1
 endef
 
 $(foreach a,$(ALIASES),$(eval $(call alias,$(a))))
@@ -102,7 +118,7 @@ $(foreach a,$(ALIASES),$(eval $(call alias,$(a))))
 clean:
 	$(shell rm -f .dc_latest)
 	$(shell rm -f .dc_history)
-	@echo .dc_* files are removed.
+	@echo .dc_* files are removed
 
 # Preset
 
